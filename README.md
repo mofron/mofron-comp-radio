@@ -1,2 +1,2 @@
-# mofron-parts-radio
-radio button component for mofron
+# mofron-comp-radio
+Radio Button Component for mofron
