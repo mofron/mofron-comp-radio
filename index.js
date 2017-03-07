@@ -55,6 +55,7 @@ mofron.comp.Radio = class extends mofron.comp.Form {
                     }
                 }
             }
+            //this.select(this.select(), true);
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -114,7 +115,7 @@ mofron.comp.Radio = class extends mofron.comp.Form {
         }
     }
     
-    select (idx) {
+    select (idx, init) {
         try {
             if (undefined === idx) {
                 /* getter */
@@ -127,23 +128,18 @@ mofron.comp.Radio = class extends mofron.comp.Form {
                     }
                     return null;
                 } else {
-                    var child = this.child();
-                    for (var idx in child) {
-                        if (true === child[idx].select()) {
-                            return idx;
-                        }
-                    }
-                    return null;
+                    return this.m_select;
                 }
             }
             /* setter */
             if ('number' !== typeof idx) {
                 throw new Error('invalid parameter');
             }
-            if (true === this.isRendered()) {
+            if ( (true === this.isRendered()) ||
+                 (true === init) ) {
                 this.child()[idx].target().prop('checked', true);
             } else {
-                this.child()[idx].select(true);
+                this.m_select = idx;
             }
         } catch (e) {
             console.error(e.stack);
@@ -159,7 +155,6 @@ mofron.comp.Radio_Element = class extends mofron.Component {
         try {
             super();
             this.name('Radio_element');
-            this.m_select = false;
             this.m_radio  = rdo;
         } catch (e) {
             console.error(e.stack);
@@ -175,23 +170,6 @@ mofron.comp.Radio_Element = class extends mofron.Component {
             check.style('float', 'left');
             this.vdom().addChild(check);
             this.target(check);
-        } catch (e) {
-            console.error(e.stack);
-            throw e;
-        }
-    }
-    
-    select (flg) {
-        try {
-            if (undefined === flg) {
-                /* getter */
-                return this.m_select;
-            }
-            /* setter */
-            if ('boolean' === typeof flg) {
-                throw new Error('invalid parameter');
-            }
-            this.m_select = flg;
         } catch (e) {
             console.error(e.stack);
             throw e;
