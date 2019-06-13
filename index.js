@@ -1,31 +1,31 @@
 /**
  * @file mofron-comp-radio/index
+ * @feature text size is automatically changed when the height is changed.
  * @author simpart
  */
-require('mofron-comp-form');
-require('mofron-comp-text');
-require('mofron-event-common');
+const mf = require("mofron");
+const FormItem = require('mofron-comp-formitem');
+const Text     = require("mofron-comp-text");
+const evCommon = require("mofron-event-oncommon");
+const Click    = require("mofron-event-click");
 
 /**
  * @class Radio
  * @brief radio component for mofron
  */
-mofron.comp.Radio = class extends mofron.comp.Form {
+mf.comp.Radio = class extends FormItem {
     /**
      * initialize radio
      *
      * @param prm_opt (string,array,mofron.comp.Text) radio text list
      * @param prm_opt (array) option
      */
-    constructor (prm_opt) {
+    constructor (po) {
         try {
             super();
-            this.name('Radio');
-            
-            this.m_select = 0;
-            this.m_selevt = null;
-            
-            this.prmOpt(prm_opt);
+            this.name("Radio");
+            this.prmMap("text");
+            this.prmOpt(po);
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -35,153 +35,161 @@ mofron.comp.Radio = class extends mofron.comp.Form {
     initDomConts (prm) {
         try {
             super.initDomConts();
+            this.horizon(true);
 
-            if (null === prm) {
+            /* init input contents */
+            let chk = new mf.Dom({
+                          tag: "input", component: this,
+                          attr : { type : "radio" }
+                      });
+
+            this.target().addChild(
+                new mf.Dom({
+                    tag: "div", component: this,
+                    style: { "display" : "flex" }, addChild: chk
+                })
+            );
+            this.target(chk);
+
+            let chg_evt = (p1,p2,p3) => {
+                try {
+                    let cbx_evt = p1.changeEvent();
+                    for (let cb_idx in cbx_evt) {
+                        cbx_evt[cb_idx][0](p1, p1.select(), cbx_evt[cb_idx][1]);
+                    }
+                } catch (e) {
+                    console.error(e.stack);
+                    throw e;
+                }
+            }
+            this.event(new evCommon(chg_evt, "onchange"));
+            this.child(this.text());
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    /**
+     * check text
+     *
+     * @param (string/mofron-comp-text) check text contents
+     * @return (mofron-comp-text) check text contents
+     */
+    text (prm) {
+        try {
+            if (true === mf.func.isInclude(prm, "Text")) {
+                prm.event(
+                    new Click([
+                        (cp1,cp2,cp3) => {
+                            cp3.target().getRawDom().click();
+                            //cp3.select(!cp3.select())
+                        },
+                        this
+                    ])
+                );
+            } else if ('string' === typeof prm) {
+                this.text().option({ text: prm });
                 return;
             }
-
-            if ('string' === typeof prm) {
-                this.addChild(new mofron.comp.Text(prm));
-            } else if ('object' === typeof prm) {
-                if (undefined === prm[0]) {
-                    this.addChild(prm);
-                } else {
-                    for (var idx in prm) {
-                        if ('string' === typeof prm[idx]) {
-                            this.addChild(new mofron.comp.Text(prm[idx]));
-                        } else if ('object' === typeof prm[idx]) {
-                            this.addChild(prm[idx]);
-                        }
-                    }
-                }
-            }
-            //this.select(this.select(), true);
+            return this.innerComp('text', prm, Text);
         } catch (e) {
             console.error(e.stack);
             throw e;
         }
     }
     
-    addChild (chd, disp) {
+   /**
+    * item value
+    *
+    * @param (boolean) true: select
+    *                  false: unselect
+    * @return (boolean) select status
+    * @type tag parameter
+    */
+    select (flg) {
         try {
-            chd.style('float', 'none');
-            var elem = new mofron.comp.Radio_Element(this);
-            elem.addChild(chd,disp);
-            
-            var onChange = new mofron.event.Common(
-                           function(obj) {
-                               try {
-                                   var chg = obj[0];
-                                   var elm = obj[1];
-                                   
-                                   var child = chg.child();
-                                   for (var idx in child) {
-                                       if (child[idx].target().getId() === elm.target().getId()) {
-                                           var evt = chg.selectEvent();
-                                           if (null !== evt) {
-                                               evt(parseInt(idx));
-                                           }
-                                       }
-                                   }
-                               } catch (e) {
-                                   console.error(e.stack);
-                                   throw e;
-                               }
-                           },
-                           [this,elem]);
-            onChange.eventName('onchange');
-            elem.addEvent(onChange);
-            
-            super.addChild(elem, disp);
-            //this.m_check.push(false);
-        } catch (e) {
-            console.error(e.stack);
-            throw e;
-        }
-    }
-    
-    selectEvent (fnc) {
-        try {
-            if (undefined === fnc) {
-                return this.m_selevt;
-            }
-            if (null === fnc) {
-                throw new Error('invalid parameter');
-            }
-            this.m_selevt = fnc;
-        } catch (e) {
-            console.error(e.stack);
-            throw e;
-        }
-    }
-    
-    select (idx, init) {
-        try {
-            if (undefined === idx) {
+            if (undefined === flg) {
                 /* getter */
-                if (true === this.isRendered()) {
-                    var child = this.child();
-                    for (var idx in child) {
-                        if (true === child[idx].target().prop('checked')) {
-                            return idx;
-                        }
-                    }
-                    return null;
-                } else {
-                    return this.m_select;
-                }
+                let ret = this.target().prop("checked");
+                return (null === ret) ? false : ret;
             }
             /* setter */
-            if ('number' !== typeof idx) {
-                throw new Error('invalid parameter');
+            if ("boolean" !== typeof flg) {
+                throw new Error("invalid parameter");
             }
-            if ( (true === this.isRendered()) ||
-                 (true === init) ) {
-                this.child()[idx].target().prop('checked', true);
-            } else {
-                this.m_select = idx;
+            let chk_buf = this.select();
+            this.target().prop("checked", flg);
+            if (chk_buf !== flg) {
+                let chg_evt = this.changeEvent();
+                for (let cidx in chg_evt) {
+                    chg_evt[cidx][0](this, flg, chg_evt[cidx][1]);
+                }
             }
         } catch (e) {
             console.error(e.stack);
             throw e;
         }
-    }
-}
-mofron.comp.radio = {};
-module.exports = mofron.comp.Radio;
-
-mofron.comp.Radio_Element = class extends mofron.Component {
-    constructor (rdo) {
-        try {
-            super();
-            this.name('Radio_element');
-            this.m_radio  = rdo;
-        } catch (e) {
+    } 
+    
+    /**
+     * item value
+     *
+     * @param (boolean) the same as 'select'
+     * @return (boolean) select status
+     * @type tag parameter
+     */
+    value (prm) {
+        try { return this.select(prm); } catch (e) {
             console.error(e.stack);
             throw e;
         }
     }
-
-    initDomConts (prm) {
+    
+    /**
+     * clear select
+     *
+     * @type function
+     */
+    clear () {
+        try { this.select(false); } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    /**
+     * radio button size
+     *
+     * @param (string (size)) radio button size (both height and width)
+     * @return (string (size)) radio button size
+     * @type tag parameter
+     */
+    size (prm) {
+        try { super.size(prm, prm); } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    /**
+     * radio button height
+     *
+     * @param (string (size)) radio button height
+     * @type tag parameter
+     */
+    height (prm) {
         try {
-            var check = new mofron.Dom('input');
-            check.attr('type'  , 'radio');
-            check.attr('name'  , this.radioName());
-            check.style('float', 'left');
-            this.vdom().addChild(check);
-            this.target(check);
+            let ret = super.height(prm);
+            if (undefined !== prm) {
+                this.text().size(prm);
+            }
+            return ret;
         } catch (e) {
             console.error(e.stack);
             throw e;
         }
     }
     
-    radioName () {
-        try {
-            return this.m_radio.target().getId();
-        } catch (e) {
-            console.error(e.stack);
-            throw e;
-        }
-    }
 }
+module.exports = mofron.comp.Radio;
