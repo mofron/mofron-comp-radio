@@ -9,16 +9,12 @@ const Text     = require("mofron-comp-text");
 const evCommon = require("mofron-event-oncommon");
 const Click    = require("mofron-event-click");
 
-/**
- * @class Radio
- * @brief radio component for mofron
- */
 mf.comp.Radio = class extends FormItem {
     /**
-     * initialize radio
+     * initialize radio component
      *
-     * @param prm_opt (string,array,mofron.comp.Text) radio text list
-     * @param prm_opt (array) option
+     * @param 'text' parameter
+     * @type private
      */
     constructor (po) {
         try {
@@ -32,12 +28,17 @@ mf.comp.Radio = class extends FormItem {
         }
     }
     
-    initDomConts (prm) {
+    /**
+     * initialize dom contents
+     * 
+     * @type private
+     */
+    initDomConts () {
         try {
             super.initDomConts();
             this.horizon(true);
 
-            /* init input contents */
+            /* init dom contents */
             let chk = new mf.Dom({
                           tag: "input", component: this,
                           attr : { type : "radio" }
@@ -50,7 +51,9 @@ mf.comp.Radio = class extends FormItem {
                 })
             );
             this.target(chk);
-
+            this.child(this.text());
+            
+            /* init change event */
             let chg_evt = (p1,p2,p3) => {
                 try {
                     let cbx_evt = p1.changeEvent();
@@ -63,7 +66,7 @@ mf.comp.Radio = class extends FormItem {
                 }
             }
             this.event(new evCommon(chg_evt, "onchange"));
-            this.child(this.text());
+            
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -71,10 +74,10 @@ mf.comp.Radio = class extends FormItem {
     }
     
     /**
-     * check text
+     * radio text
      *
-     * @param (string/mofron-comp-text) check text contents
-     * @return (mofron-comp-text) check text contents
+     * @param (string/mofron-comp-text) radio text contents
+     * @return (mofron-comp-text) radio text contents
      */
     text (prm) {
         try {
@@ -100,7 +103,7 @@ mf.comp.Radio = class extends FormItem {
     }
     
    /**
-    * item value
+    * select status
     *
     * @param (boolean) true: select
     *                  false: unselect
@@ -133,9 +136,9 @@ mf.comp.Radio = class extends FormItem {
     } 
     
     /**
-     * item value
+     * select status
      *
-     * @param (boolean) the same as 'select'
+     * @param (boolean) same as 'select'
      * @return (boolean) select status
      * @type tag parameter
      */
@@ -193,3 +196,4 @@ mf.comp.Radio = class extends FormItem {
     
 }
 module.exports = mofron.comp.Radio;
+/* end of file */
