@@ -1,0 +1,9 @@
+<require>
+    <tag load="mofron-comp-radio">Radio</tag>
+</require>
+
+<script run=init>
+let chg_evt = (p1,p2,p3) => { console.log(p2); }
+</script>
+
+<Radio size=0.5rem changeEvent=@chg_evt>radio button</Radio>

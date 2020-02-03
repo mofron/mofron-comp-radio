@@ -1,27 +1,33 @@
 /**
- * @file mofron-comp-radio/index
+ * @file mofron-comp-radio/index.js
+ * @brief radio button component for mofron
  * @feature text size is automatically changed when the height is changed.
- * @author simpart
+ * @license MIT
  */
-const mf = require("mofron");
 const FormItem = require('mofron-comp-formitem');
 const Text     = require("mofron-comp-text");
-const evCommon = require("mofron-event-oncommon");
+const onCommon = require("mofron-event-oncommon");
 const Click    = require("mofron-event-click");
+const comutl   = mofron.util.common;
 
-mf.comp.Radio = class extends FormItem {
+module.exports = class extends FormItem {
     /**
      * initialize radio component
      *
-     * @param 'text' parameter
+     * @param (mixed) short-form parameter
+     *                key-value: component config
+     * @short text
      * @type private
      */
-    constructor (po) {
+    constructor (prm) {
         try {
             super();
             this.name("Radio");
-            this.prmMap("text");
-            this.prmOpt(po);
+            this.shortForm("text");
+            /* set config */
+	    if (undefined !== prm) {
+                this.config(prm);
+	    }
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -37,36 +43,36 @@ mf.comp.Radio = class extends FormItem {
         try {
             super.initDomConts();
             this.horizon(true);
-
-            /* init dom contents */
-            let chk = new mf.Dom({
+            
+            let chk = new mofron.class.Dom({
                           tag: "input", component: this,
-                          attr : { type : "radio" }
+                          attrs : { type : "radio" }
                       });
-
-            this.target().addChild(
-                new mf.Dom({
-                    tag: "div", component: this,
-                    style: { "display" : "flex" }, addChild: chk
+            this.child(
+                new mofron.class.Component({
+                    style: { "display" : "flex" },
+                    childDom: new mofron.class.PullConf({ child: chk }),
+                    child: this.text()
                 })
             );
-            this.target(chk);
-            this.child(this.text());
-            
-            /* init change event */
-            let chg_evt = (p1,p2,p3) => {
+            this.childDom(chk);
+
+            /* set change event */
+            let radio = this;
+            let onchg = () => {
                 try {
-                    let cbx_evt = p1.changeEvent();
-                    for (let cb_idx in cbx_evt) {
-                        cbx_evt[cb_idx][0](p1, p1.select(), cbx_evt[cb_idx][1]);
+                    let chg_evt = radio.changeEvent();
+                    for (let cidx in chg_evt) {
+                        chg_evt[cidx].exec(radio,radio.select());
                     }
                 } catch (e) {
                     console.error(e.stack);
                     throw e;
                 }
             }
-            this.event(new evCommon(chg_evt, "onchange"));
-            
+            this.event(new onCommon(
+                comutl.getarg(onchg,"onchange")
+            ));
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -76,23 +82,25 @@ mf.comp.Radio = class extends FormItem {
     /**
      * radio text
      *
-     * @param (string/mofron-comp-text) radio text contents
+     * @param (mixed) string: radio text contents
+     *                mofron-comp-text: radio text contents
+     *                undefined: call as getter
      * @return (mofron-comp-text) radio text contents
+     * @type prameter
      */
     text (prm) {
         try {
-            if (true === mf.func.isInclude(prm, "Text")) {
+            if (true === comutl.isinc(prm, "Text")) {
                 prm.event(
-                    new Click([
+                    new Click(comutl.getarg(
                         (cp1,cp2,cp3) => {
-                            cp3.target().getRawDom().click();
-                            //cp3.select(!cp3.select())
+                            cp3.childDom().getRawDom().click();
                         },
                         this
-                    ])
+                    ))
                 );
             } else if ('string' === typeof prm) {
-                this.text().option({ text: prm });
+                this.text().text(prm);
                 return;
             }
             return this.innerComp('text', prm, Text);
@@ -107,26 +115,25 @@ mf.comp.Radio = class extends FormItem {
     *
     * @param (boolean) true: select
     *                  false: unselect
+    *                  undefined: call as getter
     * @return (boolean) select status
-    * @type tag parameter
+    * @type parameter
     */
     select (flg) {
         try {
+            let sts = this.childDom().props("checked");
             if (undefined === flg) {
-                /* getter */
-                let ret = this.target().prop("checked");
-                return (null === ret) ? false : ret;
+                return sts;
             }
             /* setter */
             if ("boolean" !== typeof flg) {
                 throw new Error("invalid parameter");
             }
-            let chk_buf = this.select();
-            this.target().prop("checked", flg);
-            if (chk_buf !== flg) {
+            this.childDom().props({ checked : flg });
+            if (flg !== sts) {
                 let chg_evt = this.changeEvent();
                 for (let cidx in chg_evt) {
-                    chg_evt[cidx][0](this, flg, chg_evt[cidx][1]);
+                    chg_evt[cidx].exec(this, flg);
                 }
             }
         } catch (e) {
@@ -140,10 +147,12 @@ mf.comp.Radio = class extends FormItem {
      *
      * @param (boolean) same as 'select'
      * @return (boolean) select status
-     * @type tag parameter
+     * @type parameter
      */
     value (prm) {
-        try { return this.select(prm); } catch (e) {
+        try {
+	    return this.select(prm);
+	} catch (e) {
             console.error(e.stack);
             throw e;
         }
@@ -155,7 +164,9 @@ mf.comp.Radio = class extends FormItem {
      * @type function
      */
     clear () {
-        try { this.select(false); } catch (e) {
+        try {
+	    this.select(false);
+	} catch (e) {
             console.error(e.stack);
             throw e;
         }
@@ -164,12 +175,16 @@ mf.comp.Radio = class extends FormItem {
     /**
      * radio button size
      *
-     * @param (string (size)) radio button size (both height and width)
-     * @return (string (size)) radio button size
-     * @type tag parameter
+     * @param (string(size)) radio button size (both height and width)
+     *                       undefined: call as getter
+     * @return (mixed) string(size): radio button size
+     *                 null: not set
+     * @type parameter
      */
     size (prm) {
-        try { super.size(prm, prm); } catch (e) {
+        try {
+	    super.size(prm, prm);
+	} catch (e) {
             console.error(e.stack);
             throw e;
         }
@@ -178,8 +193,11 @@ mf.comp.Radio = class extends FormItem {
     /**
      * radio button height
      *
-     * @param (string (size)) radio button height
-     * @type tag parameter
+     * @param (string(size)) radio button height
+     *                       undefined: call as getter
+     * @return (mixed) string(size): radio button height
+     *                 null: not set
+     * @type parameter
      */
     height (prm) {
         try {
@@ -193,7 +211,5 @@ mf.comp.Radio = class extends FormItem {
             throw e;
         }
     }
-    
 }
-module.exports = mofron.comp.Radio;
 /* end of file */

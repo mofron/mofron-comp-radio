@@ -1,6 +1,6 @@
 {
   "name": "mofron-comp-radio",
-  "version": "0.0.5",
+  "version": "0.1.0",
   "description": "radio button component for mofron",
   "main": "index.js",
   "scripts": {
@@ -11,12 +11,17 @@
     "url": "git+https://github.com/mofron/mofron-comp-radio.git"
   },
   "keywords": [
-    "front-end"
+    "front-end","mofron"
   ],
   "author": "simparts",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/mofron/mofron-comp-radio/issues"
   },
-  "homepage": "https://github.com/mofron/mofron-comp-radio#readme"
+  "homepage": "https://github.com/mofron/mofron-comp-radio#readme",
+  "dependencies" : {
+      "mofron-comp-formitem" : "",
+      "mofron-event-oncommon" : "",
+      "mofron-event-click" : ""
+  }
 }
