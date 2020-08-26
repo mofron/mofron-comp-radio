@@ -13,9 +13,9 @@ npm install mofron mofron-comp-radio
 
 # Sample
 ```html
-<require>
+<setting>
     <tag load="mofron-comp-radio">Radio</tag>
-</require>
+</setting>
 
 <script run=init>
 let chg_evt = (p1,p2,p3) => { console.log(p2); }
@@ -35,7 +35,7 @@ let chg_evt = (p1,p2,p3) => { console.log(p2); }
 | | | | false: unselect |
 | | | | undefined: call as getter |
 | | value | boolean | same as 'select' |
-| | clear | | | size | string(size) | radio button size (both height and width) |
+| | clear | ||| | size | string(size) | radio button size (both height and width) |
 | | | | undefined: call as getter |
 | | height | string(size) | radio button height |
 | | | | undefined: call as getter |

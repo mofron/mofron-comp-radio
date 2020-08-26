@@ -22,7 +22,7 @@ module.exports = class extends FormItem {
     constructor (prm) {
         try {
             super();
-            this.name("Radio");
+            this.modname("Radio");
             this.shortForm("text");
             /* set config */
 	    if (undefined !== prm) {
