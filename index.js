@@ -70,9 +70,7 @@ module.exports = class extends FormItem {
                     throw e;
                 }
             }
-            this.event(new onCommon(
-                comutl.getarg(onchg,"onchange")
-            ));
+            this.event(new onCommon(onchg,"onchange"), { private:true });
         } catch (e) {
             console.error(e.stack);
             throw e;
