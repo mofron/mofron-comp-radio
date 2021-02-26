@@ -8,6 +8,7 @@ const FormItem = require('mofron-comp-formitem');
 const Text     = require("mofron-comp-text");
 const onCommon = require("mofron-event-oncommon");
 const Click    = require("mofron-event-click");
+const ConfArg  = mofron.class.ConfArg;
 const comutl   = mofron.util.common;
 
 module.exports = class extends FormItem {
@@ -90,7 +91,7 @@ module.exports = class extends FormItem {
         try {
             if (true === comutl.isinc(prm, "Text")) {
                 prm.event(
-                    new Click(comutl.getarg(
+                    new Click(new ConfArg(
                         (cp1,cp2,cp3) => {
                             cp3.childDom().getRawDom().click();
                         },
