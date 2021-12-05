@@ -64,7 +64,7 @@ module.exports = class extends FormItem {
                 try {
                     let chg_evt = radio.changeEvent();
                     for (let cidx in chg_evt) {
-                        chg_evt[cidx].exec(radio,radio.select());
+                        chg_evt[cidx][0](radio, radio.select(), chg_evt[cidx][1]);
                     }
                 } catch (e) {
                     console.error(e.stack);
