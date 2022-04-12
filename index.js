@@ -132,7 +132,7 @@ module.exports = class extends FormItem {
             if (flg !== sts) {
                 let chg_evt = this.changeEvent();
                 for (let cidx in chg_evt) {
-                    chg_evt[cidx].exec(this, flg);
+                    chg_evt[cidx][0](this, flg, chg_evt[cidx][1]);
                 }
             }
         } catch (e) {
