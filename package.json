@@ -1,6 +1,6 @@
 {
   "name": "mofron-comp-radio",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "radio button component for mofron",
   "main": "index.js",
   "scripts": {

@@ -25,6 +25,9 @@ module.exports = class extends FormItem {
             super();
             this.modname("Radio");
             this.shortForm("text");
+
+            this.confmng().add('group', { type:'string' });
+
             /* set config */
 	    if (undefined !== prm) {
                 this.config(prm);
@@ -72,6 +75,18 @@ module.exports = class extends FormItem {
                 }
             }
             this.event(new onCommon(onchg,"onchange"), { private:true });
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+
+    afterRender () {
+        try {
+            super.afterRender();
+            if (null !== this.group()) {
+                this.childDom().attrs({ "name" : this.group() });
+            }
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -206,6 +221,15 @@ module.exports = class extends FormItem {
             }
             return ret;
         } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+
+    group (prm) {
+        try {
+            return this.confmng('group', prm);
+	} catch (e) {
             console.error(e.stack);
             throw e;
         }
