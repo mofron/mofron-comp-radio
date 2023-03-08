@@ -27,6 +27,7 @@ module.exports = class extends FormItem {
             this.shortForm("text");
 
             this.confmng().add('group', { type:'string' });
+            this.confmng().add('select',{ type:'boolean', init:false });
 
             /* set config */
 	    if (undefined !== prm) {
@@ -135,6 +136,7 @@ module.exports = class extends FormItem {
     */
     select (flg) {
         try {
+	    this.confmng('select',flg);
             let sts = this.childDom().props("checked");
             if (undefined === flg) {
                 return sts;
@@ -195,9 +197,15 @@ module.exports = class extends FormItem {
      *                 null: not set
      * @type parameter
      */
-    size (prm) {
+    size (wid,hei) {
         try {
-	    super.size(prm, prm);
+	    if (0 === arguments.length) {
+                return super.width();
+	    } else if (1 === arguments.length) {
+                super.size(wid, wid);
+	    } else {
+                super.size(wid, hei);
+	    }
 	} catch (e) {
             console.error(e.stack);
             throw e;
