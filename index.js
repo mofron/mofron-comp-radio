@@ -7,6 +7,7 @@
 const FormItem = require('mofron-comp-formitem');
 const Text     = require("mofron-comp-text");
 const onCommon = require("mofron-event-oncommon");
+const Common   = require("mofron-event-common");
 const Click    = require("mofron-event-click");
 const ConfArg  = mofron.class.ConfArg;
 const comutl   = mofron.util.common;
@@ -63,19 +64,11 @@ module.exports = class extends FormItem {
             this.childDom(chk);
 
             /* set change event */
-            let radio = this;
-            let onchg = () => {
-                try {
-                    let chg_evt = radio.changeEvent();
-                    for (let cidx in chg_evt) {
-                        chg_evt[cidx][0](radio, radio.select(), chg_evt[cidx][1]);
-                    }
-                } catch (e) {
-                    console.error(e.stack);
-                    throw e;
-                }
-            }
-            this.event(new onCommon(onchg,"onchange"), { private:true });
+            let radio   = this;
+	    let val_chg = (v1,v2,v3) => {
+                console.log('radio change');
+	    };
+	    this.event(new Common(val_chg,"change"), { private:true });
         } catch (e) {
             console.error(e.stack);
             throw e;
