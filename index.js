@@ -64,11 +64,37 @@ module.exports = class extends FormItem {
             this.childDom(chk);
 
             /* set change event */
-            let radio   = this;
 	    let val_chg = (v1,v2,v3) => {
-                console.log('radio change');
+                let chg_evt = v1.changeEvent();
+		for (let cidx in chg_evt) {
+                    chg_evt[cidx][0](v1, true, chg_evt[cidx][1]);
+		}
+
+		setTimeout(() => {
+		    v1.data('select_buff', true);
+		},500);
 	    };
 	    this.event(new Common(val_chg,"change"), { private:true });
+
+	    /* for group change */
+	    let grp_evt = (g1,g2,g3) => {
+                if (null === g1.group()) {
+                    return;
+                }
+                let dbg = [];
+                let grp_buf = mofron.root[0].data('mofron-comp-radio_group_' + g1.group());
+                for (let gidx in grp_buf) {
+		    if ((false == grp_buf[gidx].select()) && (true == grp_buf[gidx].data('select_buff'))) {
+                        let chg_evt = grp_buf[gidx].changeEvent();
+			for (let cidx in chg_evt) {
+                            chg_evt[cidx][0](grp_buf[gidx], false, chg_evt[cidx][1]);
+			}
+			grp_buf[gidx].data('select_buff', false);
+		    }
+                }
+	    }
+            this.event(new Common(grp_evt,"change"), { private:true });
+            this.data('select_buff', false);
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -80,6 +106,12 @@ module.exports = class extends FormItem {
             super.afterRender();
             if (null !== this.group()) {
                 this.childDom().attrs({ "name" : this.group() });
+		let grp_buf = mofron.root[0].data('mofron-comp-radio_group_' + this.group());
+		if (null === grp_buf) {
+                    mofron.root[0].data('mofron-comp-radio_group_' + this.group(), [this]);
+		} else {
+                    grp_buf.push(this);
+		}
             }
         } catch (e) {
             console.error(e.stack);
@@ -96,7 +128,7 @@ module.exports = class extends FormItem {
      * @return (mofron-comp-text) radio text contents
      * @type prameter
      */
-    text (prm) {
+    text (prm,cnf) {
         try {
             if (true === comutl.isinc(prm, "Text")) {
                 prm.event(
@@ -107,8 +139,10 @@ module.exports = class extends FormItem {
                         this
                     ))
                 );
+		prm.config(cnf);
             } else if ('string' === typeof prm) {
                 this.text().text(prm);
+                this.text().config(cnf);
                 return;
             }
             return this.innerComp('text', prm, Text);
@@ -145,11 +179,31 @@ module.exports = class extends FormItem {
                     chg_evt[cidx][0](this, flg, chg_evt[cidx][1]);
                 }
             }
+	    this.data('select_buff', flg);
         } catch (e) {
             console.error(e.stack);
             throw e;
         }
     } 
+
+    selectEvent (fnc,prm) {
+        try {
+            let sel_evt = (s1,s2,s3) => {
+                try {
+                    if ((true === s2) && ('function' === typeof fnc)) {
+                        fnc(s1,s2,s3);
+                    }
+                } catch (e) {
+                    console.error(e.stack);
+                    throw e;
+                }
+            }
+            return this.changeEvent(sel_evt,prm);
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
     
     /**
      * select status
