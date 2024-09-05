@@ -74,27 +74,8 @@ module.exports = class extends FormItem {
 		    v1.data('select_buff', true);
 		},500);
 	    };
-	    this.event(new Common(val_chg,"change"), { private:true });
+	    this.event(new onCommon(val_chg,"onchange"), { private:true });
 
-	    /* for group change */
-	    let grp_evt = (g1,g2,g3) => {
-                if (null === g1.group()) {
-                    return;
-                }
-                let dbg = [];
-                let grp_buf = mofron.root[0].data('mofron-comp-radio_group_' + g1.group());
-                for (let gidx in grp_buf) {
-		    if ((false == grp_buf[gidx].select()) && (true == grp_buf[gidx].data('select_buff'))) {
-                        let chg_evt = grp_buf[gidx].changeEvent();
-			for (let cidx in chg_evt) {
-                            chg_evt[cidx][0](grp_buf[gidx], false, chg_evt[cidx][1]);
-			}
-			grp_buf[gidx].data('select_buff', false);
-		    }
-                }
-	    }
-            this.event(new Common(grp_evt,"change"), { private:true });
-            this.data('select_buff', false);
         } catch (e) {
             console.error(e.stack);
             throw e;
